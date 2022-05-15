@@ -24,6 +24,9 @@ class File extends Model
         'updated' => FileChangedEvent::class,
     ];
 
+    public static $allowedSorts = ['created_at', 'original_name'];
+    public static $allowedFilters = ['status'];
+
 
 
     protected static function booted() : void
