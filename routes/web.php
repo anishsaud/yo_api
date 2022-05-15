@@ -20,12 +20,4 @@ Route::get('/', function () {
     return ['Laravel' => app()->version()];
 });
 
-Route::get('process', function () {
-    $f = "to_process/OsDnEwLJ6ni7WV6WEIk08Z6yUzQY5fSi7PVwb7tH.csv";
-    $f = File::latest('id')->first();
-    Excel::import(new ProductsImportService($f), $f->store_location);
-});
-
-// Route::middleware(['auth:sanctum'])->post('files/upload', [FileController::class, 'upload'])->name('files.upload');
-
 require __DIR__.'/auth.php';

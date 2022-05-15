@@ -16,13 +16,12 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
-    return $request->user();
+Route::middleware(['auth:sanctum'])->group(function () {
+    Route::get('/user', function (Request $request) {
+        return $request->user();
+    });
+    
+    Route::post('files/upload', [FileController::class, 'upload'])->name('files.upload');
+    
+    Route::get('files', [FileController::class, 'index']);
 });
-
-Route::middleware(['auth:sanctum'])->get('process', function () {
-    $f = "to_process/OsDnEwLJ6ni7WV6WEIk08Z6yUzQY5fSi7PVwb7tH.csv";
-    Excel::import(new ProductsImportService, $f);
-});
-
-Route::middleware(['auth:sanctum'])->post('files/upload', [FileController::class, 'upload'])->name('files.upload');
