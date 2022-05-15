@@ -17,7 +17,7 @@ class ProductsImportService implements ToModel, WithBatchInserts, WithChunkReadi
     {
         
     }
-    public function model(array $row)
+    public function model(array $row) : Product
     {
         return new Product([
             'id' => Encoding::fixUTF8($row["unique_key"]),
@@ -42,7 +42,7 @@ class ProductsImportService implements ToModel, WithBatchInserts, WithChunkReadi
         return 1000;
     }
 
-    public function uniqueBy()
+    public function uniqueBy() : array
     {
         return ['id'];
     }
