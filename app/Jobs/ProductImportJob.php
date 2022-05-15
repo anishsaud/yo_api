@@ -30,7 +30,7 @@ class ProductImportJob implements ShouldQueue
      *
      * @return void
      */
-    public function handle()
+    public function handle() : void
     {
         
         \Excel::import(new ProductsImportService($this->file), $this->file->store_location);
