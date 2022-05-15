@@ -10,6 +10,7 @@ use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Auth;
 
 class FileChangedEvent implements ShouldBroadcast
 {
@@ -33,7 +34,8 @@ class FileChangedEvent implements ShouldBroadcast
      */
     public function broadcastOn() : Channel | array
     {
-        return new PrivateChannel('file-changed');
+        \Log::info("file-changed-".$this->file->id);
+        return new Channel("file-changed");
     }
  
     public function broadcastAs() : string
