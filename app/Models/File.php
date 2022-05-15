@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\FileStatusEnum;
+use App\Events\FileChangedEvent;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -16,6 +17,14 @@ class File extends Model
     protected $casts = [
         'status' => FileStatusEnum::class,
     ];
+
+    protected $hidden = ["name", "store_location"];
+
+    protected $dispatchesEvents = [
+        'updated' => FileChangedEvent::class,
+    ];
+
+
 
     protected static function booted() : void
     {
