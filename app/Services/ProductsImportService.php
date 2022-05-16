@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Enums\FileStatusEnum;
 use App\Models\Product;
 use Maatwebsite\Excel\Concerns\ToModel;
 use Maatwebsite\Excel\Concerns\WithBatchInserts;
@@ -15,7 +16,8 @@ class ProductsImportService implements ToModel, WithBatchInserts, WithChunkReadi
 {
     public function __construct(public $file)
     {
-        
+        $this->file->status = FileStatusEnum::PROCESSING;
+        $this->file->save();
     }
     public function model(array $row) : Product
     {
@@ -45,5 +47,16 @@ class ProductsImportService implements ToModel, WithBatchInserts, WithChunkReadi
     public function uniqueBy() : array
     {
         return ['id'];
+    }
+
+    public function registerEvents(): array
+    {
+        $file = $this->file;
+        return [
+            'importFailed' => function() use ($file) {
+                $file->status = FileStatusEnum::FAILED;
+                $file->save();
+            },
+        ];
     }
 }

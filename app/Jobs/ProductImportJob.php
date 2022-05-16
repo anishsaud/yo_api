@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Enums\FileStatusEnum;
 use App\Models\File;
 use App\Services\ProductsImportService;
 use Illuminate\Bus\Queueable;
@@ -32,7 +33,12 @@ class ProductImportJob implements ShouldQueue
      */
     public function handle() : void
     {
-        
-        \Excel::import(new ProductsImportService($this->file), $this->file->store_location);
+        $file = $this->file;
+        \Excel::import(new ProductsImportService($this->file), $this->file->store_location)->chain([
+            'importFinished' => function() use ($file){
+                $file->status = FileStatusEnum::COMPLETED;
+                $file->save();
+            },
+        ]);
     }
 }
