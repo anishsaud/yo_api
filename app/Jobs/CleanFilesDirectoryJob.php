@@ -4,15 +4,15 @@ namespace App\Jobs;
 
 use App\Enums\FileStatusEnum;
 use App\Models\File;
-use App\Services\ProductsImportService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Storage;
 
-class ProductImportJob implements ShouldQueue
+class CleanFilesDirectoryJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
@@ -21,7 +21,7 @@ class ProductImportJob implements ShouldQueue
      *
      * @return void
      */
-    public function __construct(public File $file)
+    public function __construct()
     {
         //
     }
@@ -31,16 +31,12 @@ class ProductImportJob implements ShouldQueue
      *
      * @return void
      */
-    public function handle() : void
+    public function handle()
     {
-        $file = $this->file;
-        \Excel::import(new ProductsImportService($file), $file->store_location)->chain([
-            'importFinished' => function() use ($file){
-                FileStatusChangeJob::dispatchSync($file, FileStatusEnum::COMPLETED);
-            },
-            'cleanFiles' => function() {
-                CleanFilesDirectoryJob::dispatch();
-            },
-        ]);
+        $files = File::where('status', FileStatusEnum::COMPLETED)->get();
+        $filesToDelete = $files->map( function($file) {
+            return $file->store_location;
+        })->toArray();
+        Storage::delete($filesToDelete);
     }
 }
