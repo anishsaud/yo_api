@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Enums\FileStatusEnum;
+use App\Jobs\FileStatusChangeJob;
 use App\Models\Product;
 use Maatwebsite\Excel\Concerns\ToModel;
 use Maatwebsite\Excel\Concerns\WithBatchInserts;
@@ -16,8 +17,7 @@ class ProductsImportService implements ToModel, WithBatchInserts, WithChunkReadi
 {
     public function __construct(public $file)
     {
-        $this->file->status = FileStatusEnum::PROCESSING;
-        $this->file->save();
+        FileStatusChangeJob::dispatchSync($file, FileStatusEnum::PROCESSING);
     }
     public function model(array $row) : Product
     {
@@ -54,8 +54,7 @@ class ProductsImportService implements ToModel, WithBatchInserts, WithChunkReadi
         $file = $this->file;
         return [
             'importFailed' => function() use ($file) {
-                $file->status = FileStatusEnum::FAILED;
-                $file->save();
+                FileStatusChangeJob::dispatchSync($file, FileStatusEnum::FAILED);
             },
         ];
     }
