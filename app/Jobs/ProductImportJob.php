@@ -34,7 +34,7 @@ class ProductImportJob implements ShouldQueue
     public function handle() : void
     {
         $file = $this->file;
-        \Excel::import(new ProductsImportService($this->file), $this->file->store_location)->chain([
+        \Excel::import(new ProductsImportService($file), $file->store_location)->chain([
             'importFinished' => function() use ($file){
                 FileStatusChangeJob::dispatchSync($file, FileStatusEnum::PROCESSING);
             },
